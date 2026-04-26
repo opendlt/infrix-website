@@ -1,0 +1,14 @@
+{
+  "name": "infrix-docs",
+  "version": "0.1.0",
+  "description": "Infrix governance-spine documentation site (vitepress)",
+  "private": true,
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.3.0"
+  }
+}

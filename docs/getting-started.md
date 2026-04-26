@@ -1,0 +1,81 @@
+# Getting Started
+
+This guide takes you from zero to a running devnet that accepts your first governed intent.
+
+## Prerequisites
+
+- Go 1.22+ (build the devnet)
+- Node 20+ (run the SDK examples)
+- Optional: Rust toolchain (build the Rust SDK)
+
+## Clone and build
+
+```bash
+git clone https://github.com/opendlt/infrix-accumen
+cd infrix-accumen
+go build ./...
+```
+
+## Run the devnet
+
+```bash
+go run ./cmd/infrix server
+```
+
+By default the devnet runs in `--anchor-mode=testnet` and exposes:
+
+- HTTP REST + JSON-RPC on `:8080`
+- Cinema (governance observability) on `:8081`
+
+```
+Infrix devnet running at http://localhost:8080/rpc
+Anchor posture: mode=testnet endpoint=https://testnet.accumulatenetwork.io/v3
+Ready to accept governed intents and contract operations.
+```
+
+For unit tests or local-only experimentation, prefer `--anchor-mode=bookkeeping` so anchors stay local.
+
+## Submit your first intent
+
+The shortest possible path uses the TypeScript wallet SDK:
+
+```bash
+npm install @infrix/client @infrix/wallet
+```
+
+```typescript
+import { Wallet } from "@infrix/wallet";
+
+const wallet = new Wallet({
+  endpoint: "http://localhost:8080",
+  identity: "acc://alice.acme",
+});
+
+const intent = await wallet.submitIntent({
+  goal: "GOVERNED_TRANSFER",
+  params: { from: "acc://alice.acme", to: "acc://bob.acme", amount: 100 },
+});
+
+console.log("intent submitted:", intent.id);
+console.log("plan:", await intent.plan());
+```
+
+A full walkthrough lives in [`/tutorials/first-intent`](/tutorials/first-intent).
+
+## What happens under the hood
+
+The intent flows through the [governance spine](/governance-spine):
+
+1. **Intent** — the wallet POSTs to `/v4/intents`.
+2. **Plan** — the mediator compiles the goal into an `ExecutionPlan`.
+3. **Approval** — `GOVERNED_TRANSFER` requires the sender's signature; the wallet supplies it.
+4. **Execution** — the settlement plugin handles the value transfer.
+5. **Outcome** — a `TypeOutcomeRecord` is written.
+6. **Evidence** — the bundle is portable; export via `/v4/intents/{id}/evidence`.
+7. **Anchor** — under `--anchor-mode=testnet`, a digest goes to Accumulate testnet.
+
+## Where to go next
+
+- Read the [Governance Spine](/governance-spine) page for the conceptual model.
+- The [`examples/`](https://github.com/opendlt/infrix-accumen/tree/main/examples) directory ships nine end-to-end demos. Start with `examples/full-spine-demo`.
+- The [SDK reference](/sdk/typescript-client) covers every method on every SDK.
