@@ -1,6 +1,17 @@
 # Getting Started
 
-This guide takes you from zero to a running devnet that accepts your first governed intent.
+The fastest path to a verified proof is one command — describe an app, get a
+verifiable proof, and check it yourself without trusting the node:
+
+```bash
+infrix new verifiable-app my-escrow "escrow that releases when two approvers sign"
+infrix verify .infrixapp/my-escrow/runs/run-1/proof.infrix.json
+infrix receipt verify .infrixapp/my-escrow/runs/run-1/receipt.infrix.json
+```
+
+`infrix start` leads with this golden path (`infrix start --agent` emits it as
+JSON for AI agents). The rest of this guide takes you from zero to a running
+devnet that accepts your first governed intent.
 
 ## Prerequisites
 
