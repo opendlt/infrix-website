@@ -1,12 +1,15 @@
-// G-21 phase 4 — Infrix documentation site (vitepress).
+// Infrix documentation site (vitepress).
 //
-// The site lives under website/ and serves the governance-first
-// onboarding surface: a conceptual page explaining the spine,
-// per-SDK reference, runnable tutorials, and a cookbook for
-// approval policies / trust profiles / offline verification.
+// Serves the governance-first onboarding surface: a conceptual page
+// explaining the spine, per-SDK reference, runnable tutorials, and a
+// cookbook for approval policies / trust profiles / offline verification.
 //
-// Build:   npm --prefix website run build
-// Serve:   npm --prefix website run dev
+// Build:   npm run build
+// Serve:   npm run dev
+//
+// `base` targets GitHub Pages project hosting at
+// https://opendlt.github.io/infrix-website/. For a custom domain or an
+// org-root site, set base back to "/".
 
 import { defineConfig } from "vitepress";
 
@@ -17,7 +20,7 @@ export default defineConfig({
     "approvals, evidence, anchoring, and trust — load-bearing primitives " +
     "above the WASM contract layer.",
   lang: "en-US",
-  base: "/",
+  base: "/infrix-website/",
   cleanUrls: true,
   themeConfig: {
     nav: [
