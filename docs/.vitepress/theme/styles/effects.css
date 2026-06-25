@@ -1,0 +1,226 @@
+/* Infrix "cinematic + technical" effects layer (jazz-up pass).
+ * Ambient aurora background, glass/glow utilities, gradient text, richer
+ * scroll-reveals, and docs-chrome restyling so the site reads like a product,
+ * not a gitbook. Consumes the canonical --ifx-* tokens; adds a few documented
+ * effect tokens below. All motion honors prefers-reduced-motion. */
+
+:root {
+  /* Effect tokens (derived from the canonical palette; not new brand colors). */
+  --ifx-grad-hero: linear-gradient(
+    120deg,
+    var(--ifx-text) 0%,
+    color-mix(in srgb, var(--ifx-brand) 65%, var(--ifx-text)) 55%,
+    color-mix(in srgb, var(--ifx-verified) 70%, var(--ifx-text)) 100%
+  );
+  --ifx-glow-brand: 0 0 40px -6px color-mix(in srgb, var(--ifx-brand) 55%, transparent);
+  --ifx-glow-verified: 0 0 40px -6px color-mix(in srgb, var(--ifx-verified) 55%, transparent);
+  --ifx-glass-bg: color-mix(in srgb, var(--ifx-surface) 62%, transparent);
+  --ifx-glass-border: color-mix(in srgb, var(--ifx-text) 12%, transparent);
+}
+
+/* ============================================================= AMBIENT ===== */
+/* A fixed full-viewport aurora that sits BEHIND all content. The drifting blobs
+ * are big soft radial-gradients (inherently blurry — no expensive blur filter),
+ * animated on transform only (GPU). Subtle site-wide; the hero intensifies it. */
+.ifx-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--ifx-bg);
+}
+.ifx-ambient__blob {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.5;
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+:root:not(.dark) .ifx-ambient__blob { mix-blend-mode: multiply; opacity: 0.35; }
+.ifx-ambient__blob.b1 {
+  top: -22vw; left: -12vw;
+  background: radial-gradient(circle at center,
+    color-mix(in srgb, var(--ifx-brand) 60%, transparent) 0%, transparent 62%);
+  animation: ifx-drift-1 34s ease-in-out infinite;
+}
+.ifx-ambient__blob.b2 {
+  top: -8vw; right: -16vw;
+  background: radial-gradient(circle at center,
+    color-mix(in srgb, var(--ifx-evidence) 55%, transparent) 0%, transparent 62%);
+  animation: ifx-drift-2 42s ease-in-out infinite;
+}
+.ifx-ambient__blob.b3 {
+  bottom: -26vw; left: 30vw;
+  background: radial-gradient(circle at center,
+    color-mix(in srgb, var(--ifx-verified) 50%, transparent) 0%, transparent 64%);
+  animation: ifx-drift-3 38s ease-in-out infinite;
+}
+/* Faint technical grid + a top vignette to keep content legible. */
+.ifx-ambient__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--ifx-text) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ifx-text) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 28%, black 0%, transparent 72%);
+}
+.ifx-ambient__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ifx-bg) 55%, transparent) 70%,
+    var(--ifx-bg) 100%);
+}
+@keyframes ifx-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(8vw, 6vw) scale(1.12); }
+}
+@keyframes ifx-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-7vw, 9vw) scale(0.92); }
+}
+@keyframes ifx-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-6vw, -8vw) scale(1.15); }
+}
+
+/* Lift all real content above the ambient layer. */
+.VPNav, .VPLocalNav, .VPSidebar, .VPContent, .VPFooter, .VPDoc, .ifx-home {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================ UTILITIES ===== */
+/* Gradient headline text. */
+.ifx-grad-text {
+  background: var(--ifx-grad-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+/* Glass panel. */
+.ifx-glass {
+  background: var(--ifx-glass-bg);
+  border: 1px solid var(--ifx-glass-border);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+/* Gradient hairline border via mask (crisp, theme-aware). */
+.ifx-grad-border {
+  position: relative;
+  border-radius: var(--ifx-r-lg);
+}
+.ifx-grad-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--ifx-brand) 60%, transparent),
+    transparent 40%,
+    color-mix(in srgb, var(--ifx-verified) 50%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 3D tilt-toward-cursor (paired with the v-tilt directive, which sets --rx/--ry). */
+.ifx-tilt {
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform var(--ifx-dur) var(--ifx-ease),
+    box-shadow var(--ifx-dur) var(--ifx-ease),
+    border-color var(--ifx-dur) var(--ifx-ease);
+}
+
+/* Richer scroll-reveal variants (the .is-in toggle is added by useReveal). */
+.ifx-reveal-up,
+.ifx-reveal-scale {
+  opacity: 0;
+  transition: opacity var(--ifx-dur-slow) var(--ifx-ease),
+    transform var(--ifx-dur-slow) var(--ifx-ease);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.ifx-reveal-up { transform: translateY(26px); }
+.ifx-reveal-scale { transform: scale(0.94); }
+.ifx-reveal-up.is-in,
+.ifx-reveal-scale.is-in { opacity: 1; transform: none; }
+
+/* ======================================================= DOCS CHROME ======= */
+/* Glassy translucent nav over the ambient. */
+.VPNav .VPNavBar {
+  background: transparent !important;
+}
+.VPNav .VPNavBar.has-sidebar .content,
+.VPNavBar:not(.home) {
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+}
+.VPNavBar {
+  background: color-mix(in srgb, var(--ifx-bg) 55%, transparent) !important;
+  border-bottom: 1px solid var(--ifx-glass-border);
+}
+/* Sidebar: lighter, no hard panel — floats over the ambient. */
+.VPSidebar {
+  background: color-mix(in srgb, var(--ifx-bg) 60%, transparent) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.VPSidebarItem.level-0 .text { letter-spacing: -0.01em; }
+/* Active sidebar link gets a brand glow accent. */
+.VPSidebarItem.is-active > .item .link .text {
+  color: var(--ifx-brand) !important;
+}
+/* Docs body: glassy code blocks + softer dividers. */
+.vp-doc div[class*="language-"] {
+  border: 1px solid var(--ifx-glass-border);
+  border-radius: var(--ifx-r-md);
+  background: color-mix(in srgb, var(--ifx-surface) 70%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.vp-doc h1, .vp-doc h2 { letter-spacing: -0.025em; }
+.vp-doc h2 {
+  padding-top: 18px;
+  border-top: 1px solid var(--ifx-glass-border);
+}
+/* Custom-block callouts (tip/warning/etc.) get the glass treatment. */
+.vp-doc .custom-block {
+  border-radius: var(--ifx-r-md);
+  border: 1px solid var(--ifx-glass-border);
+  background: color-mix(in srgb, var(--ifx-surface) 55%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+/* Richer staggered page-enter for docs content — the first several blocks rise +
+   un-blur in sequence on each navigation, so docs feel composed, not dumped. */
+.VPContent .vp-doc > div > *:where(h1, h2, h3, p, ul, ol, pre, .custom-block, table, blockquote) {
+  animation: ifx-page-in var(--ifx-dur-slow) var(--ifx-ease) both;
+}
+.VPContent .vp-doc > div > *:nth-child(1) { animation-delay: 20ms; }
+.VPContent .vp-doc > div > *:nth-child(2) { animation-delay: 70ms; }
+.VPContent .vp-doc > div > *:nth-child(3) { animation-delay: 120ms; }
+.VPContent .vp-doc > div > *:nth-child(4) { animation-delay: 170ms; }
+.VPContent .vp-doc > div > *:nth-child(5) { animation-delay: 210ms; }
+.VPContent .vp-doc > div > *:nth-child(6) { animation-delay: 250ms; }
+.VPContent .vp-doc > div > *:nth-child(n + 7) { animation-delay: 290ms; }
+@keyframes ifx-page-in {
+  from { opacity: 0; transform: translateY(12px); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* ================================================== REDUCED MOTION ========= */
+@media (prefers-reduced-motion: reduce) {
+  .ifx-ambient__blob { animation: none !important; }
+  .ifx-reveal-up, .ifx-reveal-scale { opacity: 1 !important; transform: none !important; transition: none; }
+  .VPContent .vp-doc > div > * { animation: none !important; }
+}

@@ -242,9 +242,12 @@ function approverClass(state: string) {
 .ifx-walk-tab {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 14px; border-radius: var(--ifx-r-sm);
-  border: 1px solid var(--ifx-border); background: var(--ifx-surface);
+  border: 1px solid var(--ifx-glass-border);
+  background: color-mix(in srgb, var(--ifx-surface) 50%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   color: var(--ifx-text-muted); font-size: 0.86rem; cursor: pointer;
-  transition: color var(--ifx-dur-fast) var(--ifx-ease), border-color var(--ifx-dur-fast) var(--ifx-ease);
+  transition: color var(--ifx-dur-fast) var(--ifx-ease), border-color var(--ifx-dur-fast) var(--ifx-ease),
+    box-shadow var(--ifx-dur-fast) var(--ifx-ease);
 }
 .ifx-walk-tab .num {
   display: inline-grid; place-items: center; width: 20px; height: 20px;
@@ -253,15 +256,23 @@ function approverClass(state: string) {
 .ifx-walk-tab.is-done { color: var(--ifx-text); }
 .ifx-walk-tab.is-active {
   color: var(--ifx-text); border-color: var(--stage-color);
-  box-shadow: 0 0 0 1px var(--stage-color);
+  box-shadow: 0 0 0 1px var(--stage-color),
+    0 0 22px -4px color-mix(in srgb, var(--stage-color) 70%, transparent);
 }
 .ifx-walk-tab.is-active .num { background: var(--stage-color); color: var(--ifx-bg); }
 .ifx-walk-tab:focus-visible { outline: 2px solid var(--ifx-brand); outline-offset: 2px; }
 
 /* Panel */
 .ifx-walk-panel {
-  border: 1px solid var(--ifx-border); border-radius: var(--ifx-r-md);
-  background: var(--ifx-surface); padding: 24px; min-height: 280px;
+  border: 1px solid var(--ifx-glass-border); border-radius: var(--ifx-r-lg);
+  background: color-mix(in srgb, var(--ifx-surface) 55%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  padding: 24px; min-height: 280px;
+  box-shadow: 0 26px 70px -46px color-mix(in srgb, var(--ifx-brand) 45%, transparent);
+}
+/* The synced diagram's active node glows, matching the hero spine. */
+.ifx-walk-diagram :deep(.ifx-spine__node.is-active .ifx-spine__core) {
+  filter: drop-shadow(0 0 6px var(--node-color));
 }
 .ifx-walk-panel:focus-visible { outline: 2px solid var(--ifx-brand); outline-offset: 2px; }
 .stage-blurb { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-top: 0; }

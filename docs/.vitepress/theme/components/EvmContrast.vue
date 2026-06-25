@@ -62,7 +62,7 @@ withDefaults(
           >{{ row.old }}</li>
         </ul>
       </div>
-      <div class="infrix">
+      <div class="infrix ifx-grad-border">
         <p class="col-title">{{ infrixTitle }}</p>
         <ul>
           <li
@@ -82,6 +82,20 @@ withDefaults(
 .ifx-contrast-head { max-width: 760px; margin-bottom: 28px; }
 .ifx-contrast-head h2 { font-family: var(--ifx-font-display); letter-spacing: -0.02em; }
 .ifx-contrast-head .sub { color: var(--ifx-text-muted); }
+/* Glassify the columns over the ambient (overrides the flat utilities styling). */
+.ifx-contrast > div {
+  background: color-mix(in srgb, var(--ifx-surface) 52%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--ifx-r-lg);
+  padding: 24px;
+}
+.ifx-contrast .infrix {
+  border-color: transparent;
+  box-shadow: 0 26px 70px -42px color-mix(in srgb, var(--ifx-brand) 55%, transparent);
+}
+.ifx-contrast .old { opacity: 0.66; }
+
 /* Only layout inside the columns is local; the grid + glow + mute come from
    utilities.css (.ifx-contrast / .old / .infrix). */
 .ifx-contrast .col-title {

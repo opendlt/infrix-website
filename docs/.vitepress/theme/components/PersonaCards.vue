@@ -49,20 +49,21 @@ withDefaults(
 
 <template>
   <section class="ifx-personas ifx-container">
-    <h2 class="ifx-reveal">{{ heading }}</h2>
+    <h2 class="ifx-reveal-up">{{ heading }}</h2>
     <div class="grid">
-      <a
+      <div
         v-for="(p, i) in personas"
         :key="p.who"
-        class="card ifx-reveal"
-        :href="withBase(p.href)"
-        :style="{ transitionDelay: 60 * i + 'ms' }"
+        class="cell ifx-reveal-up"
+        :style="{ '--i': i + 1 }"
       >
-        <span class="icon" aria-hidden="true">{{ p.icon }}</span>
-        <span class="who">{{ p.who }}</span>
-        <span class="pitch">{{ p.pitch }}</span>
-        <span class="cta">{{ p.cta }} →</span>
-      </a>
+        <a v-tilt class="card ifx-tilt ifx-grad-border" :href="withBase(p.href)">
+          <span class="icon" aria-hidden="true">{{ p.icon }}</span>
+          <span class="who">{{ p.who }}</span>
+          <span class="pitch">{{ p.pitch }}</span>
+          <span class="cta">{{ p.cta }} →</span>
+        </a>
+      </div>
     </div>
   </section>
 </template>
@@ -73,21 +74,20 @@ withDefaults(
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 920px) { .grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+.cell { height: 100%; }
 .card {
+  position: relative;
+  height: 100%;
   display: flex; flex-direction: column; gap: 8px;
-  padding: 22px; border-radius: var(--ifx-r-md);
-  border: 1px solid var(--ifx-border); background: var(--ifx-surface);
+  padding: 22px; border-radius: var(--ifx-r-lg);
+  background: color-mix(in srgb, var(--ifx-surface) 55%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   text-decoration: none; color: var(--ifx-text);
-  transition: transform var(--ifx-dur-fast) var(--ifx-ease),
-              border-color var(--ifx-dur-fast) var(--ifx-ease),
-              box-shadow var(--ifx-dur-fast) var(--ifx-ease);
 }
-.card:hover, .card:focus-visible {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--ifx-brand) 50%, transparent);
-  box-shadow: 0 14px 40px -20px color-mix(in srgb, var(--ifx-brand) 45%, transparent);
+.card:hover {
+  box-shadow: 0 22px 56px -34px color-mix(in srgb, var(--ifx-brand) 55%, transparent);
 }
-.card:focus-visible { outline: 2px solid var(--ifx-brand); outline-offset: 2px; }
 .card .icon {
   display: inline-grid; place-items: center; width: 38px; height: 38px;
   border-radius: var(--ifx-r-sm); font-size: 1.1rem;
@@ -99,6 +99,5 @@ withDefaults(
 .card .cta { margin-top: auto; color: var(--ifx-brand); font-weight: 600; font-size: 0.9rem; }
 @media (prefers-reduced-motion: reduce) {
   .card { transition: none; }
-  .card:hover, .card:focus-visible { transform: none; }
 }
 </style>

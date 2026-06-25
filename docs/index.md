@@ -7,23 +7,25 @@ title: Infrix — describe what you want, get a proof you can trust
 
 <HomeHero />
 
+<StatBand />
+
 <TypedTerminal />
+
+<BentoFeatures />
+
+<SectionDivider />
 
 <EvmContrast />
 
 <SpineWalkthrough />
 
+<SectionDivider />
+
 <div class="ifx-container ifx-prose">
 
-## How it works — the governance spine
+## For developers — one call, the whole spine
 
-Every state-changing operation flows through one canonical pipeline:
-
-```
-intent → plan → approval → execution → outcome → evidence → anchor
-```
-
-The shortest client call submits a `submitIntent` and walks the same spine:
+Submit a `submitIntent` and Infrix walks all seven stages for you:
 
 ```typescript
 import { Wallet } from "@infrix/wallet";
@@ -42,8 +44,7 @@ const outcome = await intent.outcome();
 console.log("evidence:", outcome.evidenceBundle);
 ```
 
-Read the full model on [the governance spine](/governance-spine), or follow the
-[first-intent tutorial](/tutorials/first-intent).
+[Read the governance-spine model →](/governance-spine) &nbsp;·&nbsp; [First-intent tutorial →](/tutorials/first-intent)
 
 </div>
 
