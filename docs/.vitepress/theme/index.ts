@@ -19,6 +19,8 @@ import SpineWalkthrough from "./components/SpineWalkthrough.vue";
 import PersonaCards from "./components/PersonaCards.vue";
 // runbook 04
 import Term from "./components/Term.vue";
+// runbook 05
+import EvidenceVerifier from "./components/EvidenceVerifier.vue";
 
 export default {
   extends: DefaultTheme,
@@ -30,6 +32,7 @@ export default {
     app.component("SpineWalkthrough", SpineWalkthrough);
     app.component("PersonaCards", PersonaCards);
     app.component("Term", Term);            // runbook 04 — glossary tooltip
+    app.component("EvidenceVerifier", EvidenceVerifier);  // runbook 05 — live offline verifier
 
     // Canonical scroll-reveal wiring (owned by runbook 03). No-op under SSR.
     installReveal((cb) => {

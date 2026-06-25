@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { SPINE_STAGES } from '../data/spine';
 import { DEMO_BUNDLE } from '../data/demo-bundle';
 import type { DemoBundle, DemoFinality } from '../data/demo-bundle';
+import DEMO_EVIDENCE from '../data/demo-evidence.json';
 
 const bundle: DemoBundle = DEMO_BUNDLE;
 const stages = SPINE_STAGES;
@@ -54,37 +55,12 @@ watch(stage, (s) => {
 onMounted(() => root.value?.addEventListener('keydown', onKey));
 onBeforeUnmount(() => { root.value?.removeEventListener('keydown', onKey); stopFinalityTicker(); });
 
-// ---------------------------------------------------------------------------
-// INTEGRATION SEAM — runbook 05 (WASM verifier) replaces this mock.
-// ---------------------------------------------------------------------------
-// TODO(runbook 05): swap this canned result for the real offline verifier
-// (evidence.VerifyPortablePackage compiled to WASM). The async signature and the
-// { ok, chainHash, reason } shape are intentionally identical to the real binding
-// described in 00-overview file tree (assets/wasm) and UX-REVIEW Part 9 §4, so the
-// real verifier drops in with no template change. Until then this returns the
-// canned anchor hash from the demo bundle after a short faux-work delay.
-interface VerifyResult { ok: boolean; chainHash: string; reason?: string; }
-
-const verifyState = ref<'idle' | 'running' | 'done' | 'error'>('idle');
-const verifyResult = ref<VerifyResult | null>(null);
-
-async function verify(_bundleJSON: string): Promise<VerifyResult> {
-  // MOCK. Deterministic ✓ against the demo bundle's anchor hash.
-  await new Promise((r) => setTimeout(r, 650));
-  return { ok: true, chainHash: bundle.anchor.chainHash };
-}
-
-async function onVerify() {
-  verifyState.value = 'running';
-  verifyResult.value = null;
-  try {
-    verifyResult.value = await verify(JSON.stringify(bundle));
-    verifyState.value = verifyResult.value.ok ? 'done' : 'error';
-  } catch (err) {
-    verifyResult.value = { ok: false, chainHash: '', reason: String(err) };
-    verifyState.value = 'error';
-  }
-}
+// The real, verifiable PortableEvidencePackage that <EvidenceVerifier> checks
+// in-browser (runbook 05). It is the genuine @infrix/verify fixture — a valid
+// proof that passes all ten cryptographic checks offline, with no node and no
+// network. The friendly per-stage data above (DEMO_BUNDLE) drives the *display*;
+// this drives the *live verify*.
+const demoEvidence = DEMO_EVIDENCE;
 
 // Approver display state → CSS class (submitter greyed, approver signs green).
 function approverClass(state: string) {
@@ -237,26 +213,11 @@ function approverClass(state: string) {
         </p>
         <pre class="kv anchor"><code>{{ bundle.anchor.chainHash }}</code></pre>
 
-        <button class="ifx-verify-btn" :disabled="verifyState === 'running'" @click="onVerify">
-          <span v-if="verifyState === 'running'" class="spin" aria-hidden="true" />
-          {{ verifyState === 'running' ? 'Verifying…' : 'Verify this proof' }}
-        </button>
-
-        <p
-          v-if="verifyState === 'done' && verifyResult"
-          class="verify-result ok"
-          role="status"
-        >
-          ✓ verified offline — chain hash <code>{{ verifyResult.chainHash }}</code>
+        <EvidenceVerifier :bundle="demoEvidence" />
+        <p class="meta demo-note">
+          Sample proof, real verifier — this runs the actual offline proof-checker in your
+          browser. No node, no network: it is pure cryptography over the evidence package.
         </p>
-        <p
-          v-else-if="verifyState === 'error' && verifyResult"
-          class="verify-result err"
-          role="status"
-        >
-          ✗ verification failed — {{ verifyResult.reason }}
-        </p>
-        <p class="meta demo-note">Demo data. The live, in-browser verifier ships in a later release.</p>
       </div>
     </div>
 
@@ -380,25 +341,9 @@ function approverClass(state: string) {
 .bundle-row.tok-brand    { border-left-color: var(--ifx-brand); }
 .bundle-row.tok-verified { border-left-color: var(--ifx-verified); }
 
-/* Verify payoff */
-.ifx-verify-btn {
-  margin-top: 18px; display: inline-flex; align-items: center; gap: 10px;
-  padding: 12px 22px; border-radius: var(--ifx-r-sm); cursor: pointer;
-  font-weight: 600; color: var(--ifx-bg); background: var(--ifx-verified);
-  border: 1px solid transparent;
-}
-.ifx-verify-btn:disabled { opacity: 0.7; cursor: progress; }
-.ifx-verify-btn:focus-visible { outline: 2px solid var(--ifx-brand); outline-offset: 2px; }
-.spin {
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--ifx-bg) 40%, transparent);
-  border-top-color: var(--ifx-bg); animation: ifx-spin 0.7s linear infinite;
-}
-.verify-result { margin-top: 14px; font-weight: 600; }
-.verify-result.ok { color: var(--ifx-verified); }
-.verify-result.err { color: var(--ifx-pending); }
-.verify-result code { font-family: var(--ifx-font-mono); font-weight: 400; }
-.demo-note { margin-top: 8px; }
+/* Verify payoff — the button/spinner/result live in <EvidenceVerifier>; only the
+   caption beneath it is styled here. */
+.demo-note { margin-top: 12px; }
 
 /* Nav */
 .ifx-walk-nav { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
@@ -411,9 +356,7 @@ function approverClass(state: string) {
 .nav-btn:focus-visible { outline: 2px solid var(--ifx-brand); outline-offset: 2px; }
 .nav-pos { color: var(--ifx-text-muted); font-size: 0.86rem; margin-left: auto; }
 
-@keyframes ifx-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .spin { animation: none; }
   .finality li { transition: none; }
 }
 </style>
