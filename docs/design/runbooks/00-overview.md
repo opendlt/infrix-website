@@ -248,7 +248,7 @@ Keep this table current as efforts land (check the box, add the PR link):
 | Effort | Status | PR | Notes |
 |---|---|---|---|
 | 01 Foundation | ☑ complete (branch `redesign/01-foundation`) | _pending_ | Theme scaffold + tokens + self-hosted fonts (preload verified against emitted URL) + dark default + rewritten landing (plain-English hero, human pillars, EVM-contrast, elevated golden path) + jargon purged from index.md & meta description. Fence + build green. |
-| 02 Spine visuals | ☐ not started | | |
+| 02 Spine visuals | ☑ complete (branch `redesign/02-spine-visuals`) | _pending_ | `data/spine.ts` (single source of 7 stages) + `SpineDiagram.vue` (GPU-only CSS pulse, IntersectionObserver pause, full reduced-motion/static fallback, SSR-rendered SVG + sr-only list, role=img aria-label). Surfaced in the hero band. **Deviation:** dropped the runbook's `<ClientOnly>` wrapper — it suppressed SSR and broke the runbook's own "static spine present pre-hydration" DoD; component is SSR-safe so direct render is correct. ~10.6KB page chunk (under 40KB). Fence + build green. |
 | 03 Interactive narrative | ☐ not started | | |
 | 04 Docs experience | ☐ not started | | |
 | 05 WASM verifier | ☐ not started | | |

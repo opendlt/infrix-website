@@ -55,3 +55,11 @@
   margin: 24px 0;
 }
 .ifx-trynow .ifx-eyebrow { color: var(--ifx-verified); }
+
+/* Spine hero band (runbook 02). */
+.ifx-spine-hero { margin: 8px 0 40px; text-align: center; }
+.ifx-spine-hero h2 { margin-bottom: 28px; }
+.ifx-spine-hero__cap {
+  margin-top: 20px; color: var(--ifx-text-muted);
+  font-family: var(--ifx-font-mono); font-size: 0.9rem;
+}

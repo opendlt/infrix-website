@@ -36,6 +36,20 @@ features:
 
 <div class="ifx-home">
 
+<section class="ifx-spine-hero" aria-labelledby="ifx-spine-hero-h">
+
+<p class="ifx-eyebrow">One enforced pipeline</p>
+
+<h2 id="ifx-spine-hero-h">Every action flows through the governance spine</h2>
+
+<SpineDiagram :animated="true" />
+
+<p class="ifx-spine-hero__cap">
+  Intent in, a proof you can verify out — and no way to skip a step.
+</p>
+
+</section>
+
 ## From a sentence to a verifiable app
 
 <div class="ifx-trynow">

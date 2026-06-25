@@ -8,11 +8,12 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/utilities.css";
 
+import SpineDiagram from "./components/SpineDiagram.vue";   // runbook 02
+
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    // Global components register here in runbooks 02–05, e.g.:
-    // app.component("SpineDiagram", SpineDiagram);
-    void app;
+    // Global components register here in runbooks 02–05.
+    app.component("SpineDiagram", SpineDiagram);            // runbook 02
   },
 } satisfies Theme;
