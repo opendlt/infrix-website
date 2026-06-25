@@ -1,0 +1,57 @@
+/* Infrix layout/motion utilities. Consumes tokens from tokens.css.
+ * The animated reveal/walkthrough JS hooks land in runbook 03; the CSS here
+ * degrades to fully-visible content under prefers-reduced-motion and when no
+ * JS adds .is-in, so nothing is ever hidden in this (effort 01) static baseline. */
+
+.ifx-container {
+  max-width: var(--ifx-maxw);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* Scroll-reveal utility (canonical JS hook added in runbook 03). */
+.ifx-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--ifx-dur) var(--ifx-ease),
+    transform var(--ifx-dur) var(--ifx-ease);
+}
+.ifx-reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ifx-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* EVM-contrast grid (landing "why is this different" section). */
+.ifx-contrast {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  margin: 24px 0;
+}
+@media (max-width: 720px) {
+  .ifx-contrast { grid-template-columns: 1fr; }
+}
+.ifx-contrast > div {
+  border: 1px solid var(--ifx-border);
+  border-radius: var(--ifx-r-md);
+  padding: 20px;
+  background: var(--ifx-surface);
+}
+.ifx-contrast .old { opacity: 0.72; }
+.ifx-contrast .infrix {
+  border-color: color-mix(in srgb, var(--ifx-brand) 50%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--ifx-brand) 30%, transparent),
+    0 8px 40px -12px color-mix(in srgb, var(--ifx-brand) 35%, transparent);
+}
+
+/* "Try this now" golden-path callout. */
+.ifx-trynow {
+  border: 1px solid color-mix(in srgb, var(--ifx-verified) 40%, transparent);
+  border-radius: var(--ifx-r-md);
+  background: color-mix(in srgb, var(--ifx-verified) 8%, var(--ifx-surface));
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+.ifx-trynow .ifx-eyebrow { color: var(--ifx-verified); }

@@ -1,0 +1,67 @@
+/* Infrix design tokens — THE single source of truth for color, type, motion,
+ * spacing. Defined in docs/design/runbooks/00-overview.md §4. Other stylesheets
+ * and components consume these via var(--ifx-…); never inline raw hex.
+ *
+ * Semantic-color discipline: blue = flow, green = verified, violet = evidence,
+ * amber = pending approval. The spine/walkthrough rely on this mapping to teach.
+ */
+
+:root {
+  /* ---- Core palette (dark-first; see :root:not(.dark) for light) ---- */
+  --ifx-bg:            #0A0E14;  /* near-black, cool                       */
+  --ifx-surface:       #121823;  /* cards, raised panels                   */
+  --ifx-surface-2:     #1A2230;  /* nested / hover surfaces                */
+  --ifx-border:        #1F2A3A;  /* hairlines                              */
+  --ifx-text:          #E6EDF3;  /* primary text                          */
+  --ifx-text-muted:    #8B98A9;  /* secondary text                        */
+
+  /* ---- Semantic accents (meaning is fixed; do not reuse off-meaning) ---- */
+  --ifx-brand:         #4F8CFF;  /* FLOW: links, primary, the spine pulse  */
+  --ifx-brand-strong:  #2E6BFF;  /* hover/active of brand                  */
+  --ifx-verified:      #58E6B0;  /* CONFIRMATION: only "verified ✓" states */
+  --ifx-pending:       #F5A623;  /* APPROVALS / pending                    */
+  --ifx-evidence:      #B57EDC;  /* EVIDENCE / proof artifacts             */
+
+  /* ---- Type ---- */
+  --ifx-font-display:  "Space Grotesk", system-ui, sans-serif; /* headlines */
+  --ifx-font-body:     "Inter", system-ui, sans-serif;
+  --ifx-font-mono:     "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  /* ---- Motion ---- */
+  --ifx-ease:          cubic-bezier(0.22, 1, 0.36, 1); /* precise, no bounce */
+  --ifx-dur-fast:      180ms;
+  --ifx-dur:           280ms;
+  --ifx-dur-slow:      420ms;
+
+  /* ---- Space / radius (8px base) ---- */
+  --ifx-r-sm: 6px;  --ifx-r-md: 12px;  --ifx-r-lg: 20px;
+  --ifx-maxw: 1180px;
+}
+
+/* Light theme overrides — VitePress toggles .dark on <html>; default appearance
+ * is "dark" (config.mts), so :root above is the dark baseline and this block is
+ * the explicit light palette. Accents keep their hues; they read on both themes. */
+:root:not(.dark) {
+  --ifx-bg:         #FAFBFD;
+  --ifx-surface:    #FFFFFF;
+  --ifx-surface-2:  #F2F5F9;
+  --ifx-border:     #E2E8F0;
+  --ifx-text:       #0B1220;
+  --ifx-text-muted: #5A6B80;
+}
+
+/* Bridge: map Infrix tokens onto VitePress's own theme vars so the docs theme
+ * inherits the brand without per-page overrides. */
+:root {
+  --vp-c-brand-1: var(--ifx-brand);
+  --vp-c-brand-2: var(--ifx-brand-strong);
+  --vp-c-brand-3: var(--ifx-brand-strong);
+  --vp-font-family-base: var(--ifx-font-body);
+  --vp-font-family-mono: var(--ifx-font-mono);
+}
+.dark {
+  --vp-c-bg:      var(--ifx-bg);
+  --vp-c-bg-soft: var(--ifx-surface);
+  --vp-c-bg-alt:  var(--ifx-surface);
+  --vp-c-divider: var(--ifx-border);
+}

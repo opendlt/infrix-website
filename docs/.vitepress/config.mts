@@ -16,12 +16,50 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "Infrix",
   description:
-    "Governance-first execution fabric for Accumulate. Intents, plans, " +
-    "approvals, evidence, anchoring, and trust — load-bearing primitives " +
-    "above the WASM contract layer.",
+    "A governance-first execution layer for Accumulate. Describe what you want, " +
+    "and get back a portable receipt anyone can verify offline — no node, no " +
+    "trust in the network required.",
   lang: "en-US",
   base: "/infrix-website/",
   cleanUrls: true,
+  // Dark-first; visitors can still toggle to light.
+  appearance: "dark",
+  // Internal planning material (UX review + implementation runbooks) lives under
+  // docs/design/ so it is version-controlled next to the site, but it must never
+  // ship to the public Pages build.
+  srcExclude: ["design/**"],
+  head: [
+    // Preload the display face for LCP. Served from docs/public/fonts/ at a
+    // stable, un-hashed URL. Path includes `base`; if `base` changes
+    // (custom domain → "/"), update this href too.
+    [
+      "link",
+      {
+        rel: "preload",
+        as: "font",
+        type: "font/woff2",
+        crossorigin: "",
+        href: "/infrix-website/fonts/space-grotesk.woff2",
+      },
+    ],
+    [
+      "meta",
+      {
+        property: "og:title",
+        content: "Infrix — describe what you want, get a proof you can trust",
+      },
+    ],
+    [
+      "meta",
+      {
+        property: "og:description",
+        content:
+          "A governance-first execution layer for Accumulate. Every action ends in " +
+          "a portable receipt anyone can verify offline.",
+      },
+    ],
+    ["meta", { name: "twitter:card", content: "summary_large_image" }],
+  ],
   themeConfig: {
     nav: [
       { text: "Getting Started", link: "/getting-started" },

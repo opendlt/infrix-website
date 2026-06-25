@@ -3,16 +3,17 @@ layout: home
 
 hero:
   name: Infrix
-  text: Governance-first execution fabric
+  text: Describe what you want. Get back a proof you can trust.
   tagline: |
-    Intents, plans, approvals, evidence, anchoring, and trust —
-    load-bearing primitives above the WASM contract layer.
+    A governance-first execution layer for Accumulate. Every action flows through one
+    enforced pipeline — intent, plan, approval, execution, evidence — and ends in a
+    portable receipt anyone can verify offline, without running a node or trusting the network.
   actions:
     - theme: brand
-      text: Get Started
+      text: Start in one command
       link: /getting-started
     - theme: alt
-      text: The Governance Spine
+      text: See how it's different
       link: /governance-spine
     - theme: alt
       text: View on GitHub
@@ -21,41 +22,79 @@ hero:
 features:
   - title: Governed by default
     details: |
-      Every state-changing operation flows through the canonical
-      intent → plan → approval → execution → outcome → evidence
-      pipeline. There is no "raw transaction" path that bypasses
-      governance.
-  - title: Plural execution
+      No raw-transaction backdoor. Every state change traverses
+      intent → plan → approval → evidence. Governance you can't forget to turn on.
+  - title: Proof you can take with you
     details: |
-      The §15.1 selector picks plugins based on confidentiality,
-      cost, capability, trust, and operator preference — not a
-      hard-coded family→implementation switch.
-  - title: Verifiable offline
+      Outcomes ship a portable evidence bundle. A regulator or auditor verifies it
+      offline — no node, and no trust in us required.
+  - title: Right execution, every step
     details: |
-      Every outcome ships with a portable evidence package a
-      regulator or auditor can verify without running an Infrix
-      node.
+      Infrix picks how each action runs — by confidentiality, cost, trust, and
+      capability — instead of locking you to one hard-coded virtual machine.
 ---
 
-## What Infrix is
+<div class="ifx-home">
 
-Infrix is a **governance-first** Layer 2 fabric for Accumulate.
-Smart contracts run inside a pluralistic plugin registry; every
-contract call is a **plan step** inside a governance-mediated
-intent.
+## From a sentence to a verifiable app
 
-The traditional contract surface (`@call`, `@deploy`, raw storage)
-remains — but it sits beneath the spine, not above it. Most users
-reach for the governance API first.
+<div class="ifx-trynow">
 
-## Quick example — submit your first intent
+<span class="ifx-eyebrow">Try this now</span>
+
+```bash
+infrix new verifiable-app my-escrow "escrow that releases when two approvers sign"
+infrix verify .infrixapp/my-escrow/runs/run-1/proof.infrix.json
+```
+
+You described an app in plain English, Infrix compiled and governed it, and you verified the
+proof yourself — **offline, no node, no "trust me."**
+
+</div>
+
+## Not another EVM. Not another VM.
+
+A governance spine the contracts run *inside*. The traditional contract surface still
+exists — `@call`, `@deploy`, storage — it just sits *beneath* the spine, not above it.
+You can't bypass governance, because there's no API to.
+
+<div class="ifx-contrast">
+<div class="old">
+
+**On EVM / typical chains**
+
+- You sign a **raw transaction** and trust validators to do the right thing.
+- Governance is *described* in docs and *hoped for* in practice.
+- To audit, you trust the chain's RPC or re-run an indexer.
+- Plugin / VM choice is hard-coded.
+
+</div>
+<div class="infrix">
+
+**On Infrix**
+
+- You submit an **intent** — what you want, in plain or typed terms.
+- Governance is **enforced in code**: no path mutates state without approval + policy.
+- Every outcome ships a **portable evidence bundle** you verify **offline**.
+- Infrix picks the right execution per step — confidentiality, cost, trust, capability.
+
+</div>
+</div>
+
+## How it works — the governance spine
+
+Every state-changing operation flows through one canonical pipeline:
+
+```
+intent → plan → approval → execution → outcome → evidence → anchor
+```
+
+The shortest possible client call submits a `submitIntent` and walks the same spine:
 
 ```typescript
-import { InfrixClient } from "@infrix/client";
 import { Wallet } from "@infrix/wallet";
 
-const client = new InfrixClient({ endpoint: "http://localhost:8080" });
-const wallet = new Wallet({ identity: "acc://alice.acme" });
+const wallet = new Wallet({ endpoint: "http://localhost:8080", identity: "acc://alice.acme" });
 
 const intent = await wallet.submitIntent({
   goal: "GOVERNED_TRANSFER",
@@ -69,4 +108,7 @@ const outcome = await intent.outcome();
 console.log("evidence:", outcome.evidenceBundle);
 ```
 
-Walk-through: [`/tutorials/first-intent`](/tutorials/first-intent).
+Read the full model on [the governance spine](/governance-spine), or follow the
+[first-intent tutorial](/tutorials/first-intent).
+
+</div>

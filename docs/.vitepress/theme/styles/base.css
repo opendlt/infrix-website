@@ -1,0 +1,40 @@
+/* Infrix base styles: self-hosted brand fonts + heading treatment + landing
+ * primitives. Consumes tokens from tokens.css. */
+
+/* ---- Self-hosted variable fonts (OFL; license files live beside the woff2 in
+ * docs/public/fonts/). They sit in public/ — not theme/assets/ — so the file
+ * keeps a stable, un-hashed URL that the <link rel=preload> in config.mts can
+ * match. Vite prepends `base` to these root-relative url() references. ---- */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;        /* variable weight axis */
+  font-display: swap;
+  src: url("/fonts/space-grotesk.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;        /* variable weight axis */
+  font-display: swap;
+  src: url("/fonts/geist-mono.woff2") format("woff2");
+}
+
+/* ---- Display face on headings; tighten tracking. Body inherits VitePress. ---- */
+h1, h2, h3,
+.vp-doc h1, .vp-doc h2, .vp-doc h3 {
+  font-family: var(--ifx-font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ---- Landing-only primitives live behind .ifx-home to avoid bleeding into docs. ---- */
+.ifx-home { color: var(--ifx-text); }
+.ifx-home .ifx-eyebrow {
+  display: inline-block;
+  font-family: var(--ifx-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ifx-brand);
+  margin-bottom: 0.5rem;
+}
