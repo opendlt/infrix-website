@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { SPINE_STAGES, SPINE_ARIA_SUMMARY } from '../data/spine';
+import type { SpineStage } from '../data/spine';
 
 const props = withDefaults(
   defineProps<{
@@ -8,8 +9,13 @@ const props = withDefaults(
     animated?: boolean;
     /** Force the fully-revealed static variant (docs). Implies no pulse. */
     static?: boolean;
+    /**
+     * Highlight a single stage by id (drives the <SpineWalkthrough> sync, runbook 03).
+     * When set, that node is emphasized and the others dim. null = no highlight.
+     */
+    activeId?: SpineStage['id'] | null;
   }>(),
-  { animated: true, static: false },
+  { animated: true, static: false, activeId: null },
 );
 
 // Geometry (matches the viewBox below). Nodes are evenly spaced with a margin.
@@ -78,7 +84,7 @@ const loopStyle = computed(() => ({ '--ifx-loop': `${LOOP_MS}ms` }) as Record<st
   <div
     ref="root"
     class="ifx-spine"
-    :class="{ 'is-playing': isPlaying, 'is-static': static || !animated }"
+    :class="{ 'is-playing': isPlaying, 'is-static': static || !animated, 'has-active': activeId != null }"
     :style="loopStyle"
     role="img"
     :aria-label="SPINE_ARIA_SUMMARY"
@@ -117,7 +123,7 @@ const loopStyle = computed(() => ({ '--ifx-loop': `${LOOP_MS}ms` }) as Record<st
         v-for="stage in nodes"
         :key="stage.id"
         class="ifx-spine__node"
-        :class="`stage-${stage.id}`"
+        :class="[`stage-${stage.id}`, { 'is-active': activeId === stage.id }]"
         :style="{
           '--node-color': stage.color,
           '--node-delay': `${(stage.t * LOOP_MS).toFixed(0)}ms`,
@@ -259,6 +265,21 @@ const loopStyle = computed(() => ({ '--ifx-loop': `${LOOP_MS}ms` }) as Record<st
   0%   { transform: translateY(4px); opacity: 0.35; }
   6%   { transform: translateY(0);   opacity: 1; }
   100% { transform: translateY(0);   opacity: 1; }
+}
+
+/* ---- Active-stage highlight (walkthrough sync; used with :animated=false) ---- */
+.ifx-spine__node {
+  transition: opacity var(--ifx-dur) var(--ifx-ease);
+}
+.ifx-spine.has-active .ifx-spine__node:not(.is-active) {
+  opacity: 0.4;
+}
+.ifx-spine.has-active .ifx-spine__node.is-active .ifx-spine__ring {
+  stroke-width: 3.5;
+}
+.ifx-spine.has-active .ifx-spine__node.is-active .ifx-spine__core {
+  transform: scale(1.4);
+  transition: transform var(--ifx-dur) var(--ifx-ease);
 }
 
 /* ---- Static / reduced-motion guarantees ---- */

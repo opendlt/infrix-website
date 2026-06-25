@@ -56,6 +56,19 @@
 }
 .ifx-trynow .ifx-eyebrow { color: var(--ifx-verified); }
 
+/* Loose prose block on the layout:page landing (the "How it works" section).
+   layout:page omits VitePress's .vp-doc rhythm, so restore sensible spacing. */
+.ifx-prose { margin: 72px auto; }
+.ifx-prose h2 { margin-bottom: 16px; }
+.ifx-prose p { line-height: 1.7; }
+.ifx-prose > * + * { margin-top: 16px; }
+
+/* index.md footer note — keeps the `governance-first` fence marker visible + on-message. */
+.ifx-fence-note {
+  max-width: var(--ifx-maxw); margin: 24px auto 64px; padding-inline: 24px;
+  color: var(--ifx-text-muted); font-size: 0.9rem;
+}
+
 /* Spine hero band (runbook 02). */
 .ifx-spine-hero { margin: 8px 0 40px; text-align: center; }
 .ifx-spine-hero h2 { margin-bottom: 28px; }
