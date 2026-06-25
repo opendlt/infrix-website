@@ -20,6 +20,15 @@
   src: url("/fonts/geist-mono.woff2") format("woff2");
 }
 
+/* ---- Global focus-visible default (00-overview §7: no bare outline:none). Any
+ * interactive element that doesn't define its own ring inherits a visible brand
+ * ring on keyboard focus. Components may override with their own :focus-visible. ---- */
+:where(a, button, [tabindex], summary, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ifx-brand);
+  outline-offset: 2px;
+  border-radius: var(--ifx-r-sm);
+}
+
 /* ---- Display face on headings; tighten tracking. Body inherits VitePress. ---- */
 h1, h2, h3,
 .vp-doc h1, .vp-doc h2, .vp-doc h3 {

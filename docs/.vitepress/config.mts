@@ -59,8 +59,52 @@ export default defineConfig({
       },
     ],
     ["meta", { name: "twitter:card", content: "summary_large_image" }],
+    // Social card image — scrapers require ABSOLUTE URLs (origin + base baked in).
+    // If a custom domain is adopted, update these absolute URLs in the same commit.
+    [
+      "meta",
+      {
+        property: "og:image",
+        content: "https://opendlt.github.io/infrix-website/og/og-default.png",
+      },
+    ],
+    ["meta", { property: "og:image:width", content: "1200" }],
+    ["meta", { property: "og:image:height", content: "630" }],
+    ["meta", { property: "og:url", content: "https://opendlt.github.io/infrix-website/" }],
+    ["meta", { property: "og:type", content: "website" }],
+    [
+      "meta",
+      {
+        name: "twitter:image",
+        content: "https://opendlt.github.io/infrix-website/og/og-default.png",
+      },
+    ],
+    // Favicons. Raw head URLs are NOT base-prefixed by VitePress — they include
+    // `base` verbatim; update if `base` changes.
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/infrix-website/favicon.svg" }],
+    [
+      "link",
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/infrix-website/favicon-32.png" },
+    ],
+    [
+      "link",
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/infrix-website/apple-touch-icon.png" },
+    ],
+    // No-JS fallback: scroll-reveal content is opacity:0 until the IntersectionObserver
+    // adds .is-in (runbook 03). With JS disabled that observer never runs, so reveal
+    // everything immediately. (Reduced-motion users are already covered by CSS.)
+    [
+      "noscript",
+      {},
+      "<style>.ifx-reveal{opacity:1 !important;transform:none !important}</style>",
+    ],
   ],
   themeConfig: {
+    // Brand: the spine→checkmark mark in the nav, lowercase wordmark beside it.
+    // `logo` is a public path — VitePress prepends `base` automatically (do NOT
+    // hardcode /infrix-website/ here, unlike the raw `head` URLs above).
+    logo: "/brand/mark.svg",
+    siteTitle: "infrix",
     // Offline, client-side full-text search (MiniSearch). Ships with the static
     // build — no external service, no API key, works with the Pages deploy as-is.
     // Future upgrade: Algolia DocSearch (provider: "algolia") once the site is

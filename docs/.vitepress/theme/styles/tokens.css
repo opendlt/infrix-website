@@ -40,14 +40,26 @@
 
 /* Light theme overrides — VitePress toggles .dark on <html>; default appearance
  * is "dark" (config.mts), so :root above is the dark baseline and this block is
- * the explicit light palette. Accents keep their hues; they read on both themes. */
+ * the explicit light palette.
+ *
+ * Accents are DARKENED for the light theme (same hue, deeper) so they stay legible
+ * as text/icons on white surfaces — verified WCAG ratios (runbook 06 §3.3 audit):
+ * the dark canonical accents fail 3:1/4.5:1 on white (light green/amber on white),
+ * so each gets a light-only text-safe value here. The dark values above are
+ * unchanged. (00-overview §4: light-theme-safe variants, added with a note.) */
 :root:not(.dark) {
-  --ifx-bg:         #FAFBFD;
-  --ifx-surface:    #FFFFFF;
-  --ifx-surface-2:  #F2F5F9;
-  --ifx-border:     #E2E8F0;
-  --ifx-text:       #0B1220;
-  --ifx-text-muted: #5A6B80;
+  --ifx-bg:           #FAFBFD;
+  --ifx-surface:      #FFFFFF;
+  --ifx-surface-2:    #F2F5F9;
+  --ifx-border:       #E2E8F0;
+  --ifx-text:         #0B1220;
+  --ifx-text-muted:   #5A6B80;  /* 5.27:1 on bg */
+
+  --ifx-brand:        #2057E0;  /* 5.79:1 on bg; white-on-brand button 5.79:1 */
+  --ifx-brand-strong: #1D4FCC;  /* darker hover, stays above brand contrast */
+  --ifx-verified:     #0E7A52;  /* 5.35:1 on white (was 1.57:1) */
+  --ifx-pending:      #A35200;  /* 5.58:1 on white (was 2.03:1) */
+  --ifx-evidence:     #7E4FB8;  /* 5.68:1 on white (was 3.01:1) */
 }
 
 /* Bridge: map Infrix tokens onto VitePress's own theme vars so the docs theme
