@@ -10,7 +10,53 @@ A small TypeScript script that:
 2. Reads the compiled plan back.
 3. Approves the plan with the wallet's signing key.
 4. Awaits the outcome.
-5. Verifies the evidence bundle offline.
+5. Verifies the <Term word="evidence bundle">evidence bundle</Term> offline.
+
+## Same submission, any SDK
+
+The full walkthrough below is TypeScript. The same `submitIntent` call exists in every SDK —
+pick the one you build in:
+
+::: code-group
+
+```typescript [TypeScript]
+import { Wallet } from "@infrix/wallet";
+
+const wallet = new Wallet({ endpoint: "http://localhost:8080", identity: "acc://alice.acme" });
+
+const intent = await wallet.submitIntent({
+  goal: "GOVERNED_TRANSFER",
+  params: { from: "acc://alice.acme", to: "acc://bob.acme", amount: 100 },
+});
+```
+
+```rust [Rust]
+use infrix_wallet::{Wallet, IntentRequest};
+use serde_json::json;
+
+let wallet = Wallet::connect("http://localhost:8080", "acc://alice.acme").await?;
+
+let intent = wallet
+    .submit_intent(IntentRequest {
+        goal: "GOVERNED_TRANSFER".into(),
+        params: json!({ "from": "acc://alice.acme", "to": "acc://bob.acme", "amount": 100 }),
+    })
+    .await?;
+```
+
+```typescript [AssemblyScript]
+// AssemblyScript SDK — same shape, compiled to WASM.
+import { Wallet, IntentRequest } from "@infrix/assemblyscript";
+
+const wallet = new Wallet("http://localhost:8080", "acc://alice.acme");
+
+const intent = wallet.submitIntent(<IntentRequest>{
+  goal: "GOVERNED_TRANSFER",
+  params: `{"from":"acc://alice.acme","to":"acc://bob.acme","amount":100}`,
+});
+```
+
+:::
 
 ## Setup
 

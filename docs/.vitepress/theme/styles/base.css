@@ -27,9 +27,14 @@ h1, h2, h3,
   letter-spacing: -0.02em;
 }
 
-/* ---- Landing-only primitives live behind .ifx-home to avoid bleeding into docs. ---- */
+/* ---- Landing-only colour primitive. ---- */
 .ifx-home { color: var(--ifx-text); }
-.ifx-home .ifx-eyebrow {
+
+/* ---- .ifx-eyebrow: a global label utility (mono, uppercase, brand). Global —
+ * not scoped to .ifx-home — so it also styles the "Try this now" callout in the
+ * docs (getting-started.md). Context overrides (e.g. .ifx-trynow .ifx-eyebrow)
+ * recolour it; the typography here is shared. ---- */
+.ifx-eyebrow {
   display: inline-block;
   font-family: var(--ifx-font-mono);
   font-size: 0.8rem;

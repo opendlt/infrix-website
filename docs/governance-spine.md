@@ -1,12 +1,19 @@
 # The Governance Spine
 
-Every state-changing operation in Infrix flows through one canonical pipeline:
+Every state-changing operation in Infrix flows through one canonical pipeline — one enforced
+path from what you want to a proof anyone can check:
+
+<SpineDiagram :static="true" />
+
+<!-- Plain-text fallback: the diagram above is the same seven stages, drawn. -->
 
 ```
 intent → plan → approval → execution → outcome → evidence → anchor
 ```
 
-This is the **governance spine**. Each stage has a typed object, a policy hook, and an evidence contribution. There is no path that mutates state without traversing it.
+This is the <Term word="governance spine">governance spine</Term>. Each stage has a typed
+object, a policy hook, and an evidence contribution. There is no path that mutates state
+without traversing it.
 
 ## Stage by stage
 
@@ -24,21 +31,21 @@ An `ExecutionPlan` is a deterministic sequence of steps. Each step has:
 - Approval requirements (`PlanApprovalReq`) sized by the step's risk class.
 
 ### 3. Approval
-Approvals are gathered from the actors named on each `PlanApprovalReq`. The pipeline supports separation-of-duties (the actor that approves cannot be the actor that submitted), threshold-based multi-party approval, and freshness invalidation (an approval bound to a plan-hash is invalidated when the plan re-compiles).
+<Term word="approval">Approvals</Term> are gathered from the actors named on each `PlanApprovalReq`. The pipeline supports <Term word="separation of duties">separation-of-duties</Term> (the actor that approves cannot be the actor that submitted), threshold-based multi-party approval, and freshness invalidation (an approval bound to a plan-hash is invalidated when the plan re-compiles).
 
 ### 4. Execution
-The plan executor walks the topologically-sorted steps, dispatching each through `pluginRegistry.DispatchWithCriteria`. The §15.1 selector picks the best plugin per step from the criteria (confidentiality, cost cap, capabilities, trust domains, operator preference, historical reliability).
+The plan executor walks the topologically-sorted steps, dispatching each through `pluginRegistry.DispatchWithCriteria`. Infrix's selector picks the best plugin per step from the criteria (confidentiality, cost cap, capabilities, trust domains, operator preference, historical reliability).
 
 Plugins fire universal policy hooks (`plugin:admit`, `plugin:execute`, `plugin:finalize`) and category hooks (`settlement:reserve`, `external:send`, etc.) at canonical lifecycle points.
 
 ### 5. Outcome
-Each step produces a `StepResult`; the executor aggregates them into an `OutcomeRecord` with finality state, gas usage, and policy decisions. The outcome is a managed object — readers consult it via `GetWithActor` with a `DisclosureContext`.
+Each step produces a `StepResult`; the executor aggregates them into an `OutcomeRecord` with <Term word="finality">finality</Term> state, gas usage, and policy decisions. The outcome is a managed object — readers consult it via `GetWithActor` with a `DisclosureContext`.
 
 ### 6. Evidence
-Every plugin contributes to an `EvidenceBundle`: trace digests, trust snapshots, plan-hash binding, capability proofs, anchor references. The bundle is portable — a regulator or auditor can verify it offline via `evidence.VerifyPortablePackage` without running an Infrix node.
+Every plugin contributes to an `EvidenceBundle`: trace digests, trust snapshots, plan-hash binding, capability proofs, anchor references. The <Term word="evidence bundle">evidence bundle</Term> is portable — a regulator or auditor can verify it offline via `evidence.VerifyPortablePackage` without running an Infrix node.
 
 ### 7. Anchor
-The `AnchorOrchestrator` writes a digest of the outcome + evidence to Accumulate L0 (or stays in bookkeeping mode per `--anchor-mode`). Anchor confirmation drives the outcome's finality from `provisional` → `locally_final` → `l0_anchored_final`.
+The `AnchorOrchestrator` writes a digest of the outcome + evidence to Accumulate L0 (or stays in bookkeeping mode per `--anchor-mode`). <Term word="anchor">Anchor</Term> confirmation drives the outcome's finality from `provisional` → `locally_final` → `l0_anchored_final`.
 
 ## What is *not* on the spine
 

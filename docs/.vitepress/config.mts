@@ -61,6 +61,22 @@ export default defineConfig({
     ["meta", { name: "twitter:card", content: "summary_large_image" }],
   ],
   themeConfig: {
+    // Offline, client-side full-text search (MiniSearch). Ships with the static
+    // build — no external service, no API key, works with the Pages deploy as-is.
+    // Future upgrade: Algolia DocSearch (provider: "algolia") once the site is
+    // crawlable and an index is provisioned.
+    search: {
+      provider: "local",
+      options: {
+        miniSearch: {
+          searchOptions: {
+            fuzzy: 0.2,
+            prefix: true,
+            boost: { title: 4, text: 2, titles: 1 },
+          },
+        },
+      },
+    },
     nav: [
       { text: "Getting Started", link: "/getting-started" },
       { text: "Governance Spine", link: "/governance-spine" },
