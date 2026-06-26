@@ -127,9 +127,13 @@ export default defineConfig({
       { text: "SDKs", link: "/sdk/typescript-client" },
       { text: "Tutorials", link: "/tutorials/first-intent" },
     ],
+    // `collapsed: false` makes each group collapsible (expanded by default) with
+    // VitePress's built-in animated caret + height transition (polished further in
+    // effects.css). "Start Here" stays open; the longer groups can fold away.
     sidebar: [
       {
         text: "Start Here",
+        collapsed: false,
         items: [
           { text: "Getting Started", link: "/getting-started" },
           { text: "The Governance Spine", link: "/governance-spine" },
@@ -137,6 +141,7 @@ export default defineConfig({
       },
       {
         text: "SDKs",
+        collapsed: false,
         items: [
           { text: "TypeScript Client", link: "/sdk/typescript-client" },
           { text: "TypeScript Wallet", link: "/sdk/typescript-wallet" },
@@ -146,6 +151,7 @@ export default defineConfig({
       },
       {
         text: "Tutorials",
+        collapsed: false,
         items: [
           { text: "First Intent", link: "/tutorials/first-intent" },
           { text: "Multi-Party Trade", link: "/tutorials/multi-party-trade" },
@@ -154,6 +160,7 @@ export default defineConfig({
       },
       {
         text: "Cookbook",
+        collapsed: false,
         items: [
           { text: "Approval Policies", link: "/cookbook/approval-policies" },
           { text: "Trust Profiles", link: "/cookbook/trust-profiles" },

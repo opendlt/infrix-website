@@ -175,6 +175,45 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+/* Animated collapse: VitePress snaps groups via display:none — replace that with a
+   smooth max-height + opacity transition so collapsing/expanding glides. The caret
+   rotation is already animated by VitePress; we just harmonize its easing. */
+.VPSidebarItem.collapsible > .items {
+  overflow: hidden;
+  max-height: 320px;
+  opacity: 1;
+  transition: max-height var(--ifx-dur-slow) var(--ifx-ease),
+    opacity var(--ifx-dur) var(--ifx-ease);
+}
+.VPSidebarItem.collapsible.collapsed > .items {
+  display: block !important;   /* override VitePress display:none so it can animate */
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.VPSidebarItem .caret-icon {
+  transition: transform var(--ifx-dur) var(--ifx-ease) !important;
+}
+.VPSidebarItem.collapsible > .item .caret { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  .VPSidebarItem.collapsible > .items { transition: none; }
+}
+
+/* Collapsible docs sidebar (desktop ≥960px). OPEN by default; <SidebarToggle> adds
+   `ifx-sidebar-collapsed` to <html> to hide it — the sidebar slides out and the
+   content's reserved padding transitions to 0 to reclaim the space. It auto-hides
+   on scroll / outside-click and re-opens on hover of the edge tab. The `!important`
+   beats VitePress's scoped `.VPSidebar[data-v]` transform (attribute selector →
+   higher specificity). */
+@media (min-width: 960px) {
+  .VPSidebar { transition: transform var(--ifx-dur-slow) var(--ifx-ease); will-change: transform; }
+  .VPContent.has-sidebar { transition: padding-left var(--ifx-dur-slow) var(--ifx-ease); }
+  html.ifx-sidebar-collapsed .VPSidebar { transform: translateX(-100%) !important; }
+  html.ifx-sidebar-collapsed .VPContent.has-sidebar { padding-left: 0 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .VPSidebar, .VPContent.has-sidebar { transition: none; }
+}
 .VPSidebarItem.level-0 .text { letter-spacing: -0.01em; }
 /* Active sidebar link gets a brand glow accent. */
 .VPSidebarItem.is-active > .item .link .text {
@@ -188,6 +227,11 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
+/* Code blocks must scroll horizontally, never widen the page. Global (not scoped
+   to .vp-doc) so the landing's code — layout:page lacks .vp-doc's overflow rules —
+   is constrained too. This was the source of mobile horizontal overflow. */
+div[class*="language-"] { max-width: 100%; }
+div[class*="language-"] pre { overflow-x: auto; max-width: 100%; }
 .vp-doc h1, .vp-doc h2 { letter-spacing: -0.025em; }
 .vp-doc h2 {
   padding-top: 18px;

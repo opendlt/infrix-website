@@ -111,12 +111,13 @@ function onKeydown(e: KeyboardEvent) {
   border-radius: 2px;
 }
 .ifx-term__tip {
+  display: none;            /* removed from layout when closed → no page overflow */
   position: absolute;
   left: 0;
   bottom: calc(100% + 8px);
   z-index: 50;
   width: max-content;
-  max-width: min(320px, 80vw);
+  max-width: min(300px, calc(100vw - 32px));
   padding: 10px 12px;
   border: 1px solid var(--ifx-border);
   border-radius: var(--ifx-r-sm);
@@ -135,6 +136,7 @@ function onKeydown(e: KeyboardEvent) {
     transform var(--ifx-dur-fast, 180ms) var(--ifx-ease, ease);
 }
 .ifx-term__tip[data-open="true"] {
+  display: block;
   opacity: 1;
   transform: none;
 }

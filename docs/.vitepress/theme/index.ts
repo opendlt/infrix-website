@@ -14,6 +14,7 @@ import { vTilt } from "./directives/tilt";
 import AmbientBackground from "./components/AmbientBackground.vue";
 import ScrollProgress from "./components/ScrollProgress.vue";
 import SectionDivider from "./components/SectionDivider.vue";
+import SidebarToggle from "./components/SidebarToggle.vue";
 
 // runbook 02
 import SpineDiagram from "./components/SpineDiagram.vue";
@@ -36,13 +37,14 @@ export default {
   // Inject the site-wide aurora + scroll-progress bar via the layout-top slot.
   Layout: () =>
     h(DefaultTheme.Layout, null, {
-      "layout-top": () => [h(AmbientBackground), h(ScrollProgress)],
+      "layout-top": () => [h(AmbientBackground), h(ScrollProgress), h(SidebarToggle)],
     }),
   enhanceApp({ app, router }) {
     app.directive("tilt", vTilt);
     app.component("AmbientBackground", AmbientBackground);
     app.component("ScrollProgress", ScrollProgress);
     app.component("SectionDivider", SectionDivider);
+    app.component("SidebarToggle", SidebarToggle);
     app.component("SpineDiagram", SpineDiagram);
     app.component("HomeHero", HomeHero);
     app.component("TypedTerminal", TypedTerminal);
