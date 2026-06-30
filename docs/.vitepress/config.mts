@@ -169,7 +169,7 @@ export default defineConfig({
       },
     ],
     socialLinks: [
-      { icon: "github", link: "https://github.com/opendlt/infrix-accumen" },
+      { icon: "github", link: "https://github.com/opendlt" },
     ],
     footer: {
       message: "Released under the MIT License.",

@@ -21,22 +21,42 @@ devnet that accepts your first governed <Term word="intent">intent</Term>.
 
 ## Prerequisites
 
-- Go 1.22+ (build the devnet)
-- Node 20+ (run the SDK examples)
-- Optional: Rust toolchain (build the Rust SDK)
+- The `infrix` CLI (install below) — it bundles the local devnet, so there is nothing to clone or build.
+- Node 20+ (to run the SDK examples)
+- Optional: Rust toolchain (to author Rust contracts)
 
-## Clone and build
+## Install the CLI
+
+Prebuilt, checksum-verified binaries:
 
 ```bash
-git clone https://github.com/opendlt/infrix-accumen
-cd infrix-accumen
-go build ./...
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/opendlt/infrix-cli/main/install.sh | sh
+```
+
+```powershell
+# Windows
+iwr -useb https://raw.githubusercontent.com/opendlt/infrix-cli/main/install.ps1 | iex
+```
+
+```bash
+# Node users, no global install
+npx @infrix/cli version
+```
+
+Confirm it works:
+
+```bash
+infrix version
+infrix doctor
 ```
 
 ## Run the devnet
 
+The CLI bundles a local devnet — no clone, no build:
+
 ```bash
-go run ./cmd/infrix server
+infrix server
 ```
 
 By default the devnet runs in `--anchor-mode=testnet` and exposes:
@@ -133,5 +153,5 @@ The intent flows through the [governance spine](/governance-spine):
 ## Where to go next
 
 - Read the [Governance Spine](/governance-spine) page for the conceptual model.
-- The [`examples/`](https://github.com/opendlt/infrix-accumen/tree/main/examples) directory ships nine end-to-end demos. Start with `examples/full-spine-demo`.
+- The `examples/` directory in the runtime repo ships nine end-to-end demos (start with `examples/full-spine-demo`).
 - The [SDK reference](/sdk/typescript-client) covers every method on every SDK.

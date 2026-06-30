@@ -49,7 +49,7 @@ The `AnchorOrchestrator` writes a digest of the outcome + evidence to Accumulate
 
 ## What is *not* on the spine
 
-The traditional contract surface (storage, function calls, events) lives **inside** an `execute` step — it is *what the spine schedules under the hood*. Smart contracts call host functions to read/write storage, but every storage write is a `StateChange` recorded in the step result and propagated through the dual-state finality window (see [`pkg/rewind`](https://github.com/opendlt/infrix-accumen/tree/main/pkg/rewind)).
+The traditional contract surface (storage, function calls, events) lives **inside** an `execute` step — it is *what the spine schedules under the hood*. Smart contracts call host functions to read/write storage, but every storage write is a `StateChange` recorded in the step result and propagated through the dual-state finality window (handled by the runtime's `pkg/rewind`).
 
 There is no API for "raw transactions" — every write originates from an intent.
 

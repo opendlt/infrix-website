@@ -157,7 +157,7 @@ You exercised every stage of the [governance spine](/governance-spine):
 
 ## Verify the demo with `examples/full-spine-demo`
 
-The repo's [`examples/full-spine-demo`](https://github.com/opendlt/infrix-accumen/tree/main/examples/full-spine-demo) is the Go-side counterpart of this tutorial. It exercises the same lifecycle in-process and emits a `PortableEvidencePackage` for offline verification — handy for CI.
+The runtime repo's `examples/full-spine-demo` is the Go-side counterpart of this tutorial. It exercises the same lifecycle in-process and emits a `PortableEvidencePackage` for offline verification — handy for CI.
 
 ```bash
 go test ./examples/full-spine-demo -v
