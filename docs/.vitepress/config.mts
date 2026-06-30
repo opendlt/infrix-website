@@ -122,6 +122,7 @@ export default defineConfig({
       },
     },
     nav: [
+      { text: "Why Infrix", link: "/why-infrix" },
       { text: "Getting Started", link: "/getting-started" },
       { text: "Governance Spine", link: "/governance-spine" },
       { text: "SDKs", link: "/sdk/typescript-client" },
@@ -135,6 +136,7 @@ export default defineConfig({
         text: "Start Here",
         collapsed: false,
         items: [
+          { text: "Why Infrix", link: "/why-infrix" },
           { text: "Getting Started", link: "/getting-started" },
           { text: "The Governance Spine", link: "/governance-spine" },
         ],
