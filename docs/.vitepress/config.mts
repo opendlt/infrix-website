@@ -20,7 +20,7 @@ export default defineConfig({
     "and get back a portable receipt anyone can verify offline — no node, no " +
     "trust in the network required.",
   lang: "en-US",
-  base: "/infrix-website/",
+  base: "/",
   cleanUrls: true,
   // Dark-first; visitors can still toggle to light.
   appearance: "dark",
