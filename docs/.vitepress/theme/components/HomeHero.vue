@@ -25,9 +25,9 @@ withDefaults(
 
     <div class="ifx-hero__inner ifx-container">
       <div class="ifx-hero__copy">
-        <a class="ifx-pill" :href="withBase('/getting-started')">
+        <a class="ifx-pill" href="https://play.infrix.opendlt.org" target="_blank" rel="noopener">
           <span class="ifx-pill__dot" aria-hidden="true" />
-          Live offline verifier — check a real proof in your browser
+          Live playground — run a governed flow & verify the proof in your browser
         </a>
 
         <h1 class="ifx-hero__title">
@@ -38,11 +38,11 @@ withDefaults(
         <p class="ifx-hero__sub">{{ tagline }}</p>
 
         <div class="ifx-hero__cta">
-          <a class="ifx-btn ifx-btn--primary" :href="withBase('/getting-started')">
-            Start in one command <span aria-hidden="true">▸</span>
+          <a class="ifx-btn ifx-btn--primary" href="https://play.infrix.opendlt.org" target="_blank" rel="noopener">
+            Try the live playground <span aria-hidden="true">▸</span>
           </a>
-          <a class="ifx-btn ifx-btn--ghost" :href="withBase('/governance-spine')">
-            See how it works <span aria-hidden="true">↓</span>
+          <a class="ifx-btn ifx-btn--ghost" :href="withBase('/getting-started')">
+            Start in one command <span aria-hidden="true">↓</span>
           </a>
         </div>
       </div>
