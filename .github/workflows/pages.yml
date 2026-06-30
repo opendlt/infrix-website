@@ -5,18 +5,19 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Pages "Source" is the gh-pages branch, so this workflow builds the site and
+# publishes the built output to gh-pages on every push to main. (The base is
+# "/" for the infrix.opendlt.org custom domain; docs/public/CNAME carries the
+# domain into the build output.)
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Allow one concurrent deployment; let an in-progress run finish.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,17 +30,14 @@ jobs:
       # vitepress config well-formed, governance-first framing intact.
       - run: node --test docs-structure.test.mjs
       - run: npm run build
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vitepress/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
+      - name: Publish to gh-pages
+        run: |
+          cd docs/.vitepress/dist
+          touch .nojekyll
+          test -f CNAME || echo "infrix.opendlt.org" > CNAME
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${{ github.sha }}"
+          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
