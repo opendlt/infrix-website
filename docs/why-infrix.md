@@ -48,4 +48,4 @@ console.log(r.passed ? '✅ verified offline — no node trusted' : '❌ failed'
 
 Candor is the point: you don't have to take any of this on faith. **Run it. Verify it. Try to forge it.**
 
-→ [Start building](/getting-started) · [Try the playground](https://play.infrix.opendlt.org)
+→ [See a real proof on the public ledger](/proof-live) · [Start building](/getting-started) · [Try the playground](https://play.infrix.opendlt.org)

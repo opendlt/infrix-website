@@ -47,6 +47,9 @@ withDefaults(
           <a class="ifx-btn ifx-btn--ghost" :href="withBase('/why-infrix')">
             Why Infrix vs Ethereum? <span aria-hidden="true">→</span>
           </a>
+          <a class="ifx-btn ifx-btn--ghost" :href="withBase('/proof-live')">
+            See a real proof on-ledger <span aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
 
