@@ -29,6 +29,8 @@ export default defineConfig({
   // ship to the public Pages build.
   srcExclude: ["design/**"],
   head: [
+    // Privacy-first, cookieless analytics (infrix-prism) — respects DNT, no cookies, no PII.
+    ["script", { defer: "", "data-site": "infrix-website", src: "https://analytics.infrix.opendlt.org/prism.js" }],
     // Preload the display face for LCP. Served from docs/public/fonts/ at a
     // stable, un-hashed URL. Path includes `base`; if `base` changes
     // (custom domain → "/"), update this href too.
