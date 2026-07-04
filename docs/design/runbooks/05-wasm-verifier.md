@@ -1,5 +1,13 @@
 # Runbook 05 — Live WASM Evidence Verifier
 
+> **✅ IMPLEMENTED / HISTORICAL (stamped 2026-07-04).** This runbook is the plan
+> for the live verifier; it has since shipped. The canned/mock `verify()` seam it
+> describes replacing is now the **real** offline verifier — the vendored,
+> byte-exact JS mirror of Go `pkg/evidence/portable.go` in
+> `docs/.vitepress/theme/lib/verify/portableVerifier.js` (from `@infrix/verify`),
+> called by `theme/components/EvidenceVerifier.vue`. Read the "mock/fallback"
+> passages below as the pre-implementation plan, not the current site.
+
 > **Effort 5 of 6.** Prerequisites: runbooks **02** (`<SpineDiagram>` + `theme/data/spine.ts`)
 > and **03** (`<SpineWalkthrough>` + `theme/data/demo-bundle.ts` + the canned `verify()` seam).
 > Read [`00-overview.md`](./00-overview.md) first — tokens, file tree, DoD, perf budget, and the

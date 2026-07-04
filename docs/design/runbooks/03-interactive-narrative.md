@@ -1,5 +1,12 @@
 # Runbook 03 — Interactive Narrative: The Scrollytelling Landing Components
 
+> **✅ IMPLEMENTED / HISTORICAL (stamped 2026-07-04).** This is the pre-build plan.
+> The "(mocked) proof verify" and the `verify()` seam described here shipped as the
+> **real** client-side verifier (runbook 05): `EvidenceVerifier.vue` runs the
+> vendored byte-exact mirror of the Go portable verifier — no mock, no node, no
+> network. The `demo-bundle.ts` data remains a deterministic fixture, but the
+> verification path over it is genuine.
+
 > **Effort 3 of 6.** Prerequisites: runbook [`01`](./01-foundation.md) (theme scaffold,
 > tokens, rewritten copy) and runbook [`02`](./02-spine-visuals.md) (`<SpineDiagram>` +
 > `theme/data/spine.ts`). Unblocks: runbook [`05`](./05-wasm-verifier.md) (the `verify()`

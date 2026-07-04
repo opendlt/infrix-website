@@ -1,5 +1,18 @@
 # Infrix Website Redesign — Implementation Overview & Shared Conventions
 
+> **⚠️ HISTORICAL IMPLEMENTATION PLAN (stamped 2026-07-04).** These runbooks are
+> the *plan* for the site redesign, written before the work landed. They are kept
+> for provenance and should not be read as a description of the shipped site.
+> Where a runbook describes a **mocked** seam — most importantly the "(mocked)
+> proof verify" in runbooks 03 and 05 — that mock has since been **replaced by the
+> real client-side verifier**: `docs/.vitepress/theme/components/EvidenceVerifier.vue`
+> calls the vendored, byte-exact JS mirror of the Go `pkg/evidence/portable.go`
+> verifier (`theme/lib/verify/portableVerifier.js`, sourced from `@infrix/verify`;
+> see `theme/lib/verify/SOURCE.md`). The shipped proof verification runs the full
+> offline cryptographic check with no node and no network call — it is **not** a
+> mock. Treat the "mock/fallback" wording below as describing a build step that is
+> already done.
+>
 > **Read this first.** Every runbook (`01`–`06`) assumes the conventions defined
 > here: the file tree, the canonical design tokens, the component contracts, the
 > banned-jargon list, and the definition-of-done. Do not redefine tokens or
