@@ -127,6 +127,7 @@ export default defineConfig({
       { text: "Why Infrix", link: "/why-infrix" },
       { text: "Proof, live", link: "/proof-live" },
       { text: "Getting Started", link: "/getting-started" },
+      { text: "Composer", link: "https://composer.infrix.opendlt.org" },
       { text: "Governance Spine", link: "/governance-spine" },
       { text: "SDKs", link: "/sdk/typescript-client" },
       { text: "Tutorials", link: "/tutorials/first-intent" },

@@ -41,6 +41,9 @@ withDefaults(
           <a class="ifx-btn ifx-btn--primary" href="https://play.infrix.opendlt.org" target="_blank" rel="noopener">
             Try the live playground <span aria-hidden="true">▸</span>
           </a>
+          <a class="ifx-btn ifx-btn--primary" href="https://composer.infrix.opendlt.org" target="_blank" rel="noopener">
+            Compose a capability <span aria-hidden="true">▸</span>
+          </a>
           <a class="ifx-btn ifx-btn--ghost" :href="withBase('/getting-started')">
             Start in one command <span aria-hidden="true">↓</span>
           </a>
