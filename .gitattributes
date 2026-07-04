@@ -1,0 +1,17 @@
+# Normalize all text to LF and pin LF on checkout so core.autocrlf=true on Windows
+# never rewrites the working tree to CRLF. Preventive (second-pass audit D7): guards
+# byte-sensitive generated site assets and fixtures if any are added later. Binary
+# files are auto-detected by text=auto and left untouched.
+* text=auto eol=lf
+
+# Fonts and raster images are binary — never touch their bytes.
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
