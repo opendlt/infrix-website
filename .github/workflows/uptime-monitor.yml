@@ -1,0 +1,182 @@
+name: Live Stack Uptime Monitor
+
+# OPERATE-02 Phase 3+6: external, out-of-band checks that the public Infrix
+# stack is up and its certs are valid — plus targeted link-health on the funnel
+# pages and the L0 anchor-signer credit floor. Runs on neutral GitHub infra (so
+# a Hetzner-box outage still fires the alert), opens a deduplicated GitHub issue
+# on failure, and auto-closes it on recovery.
+#
+# WHY THIS LIVES IN infrix-website (public) AND NOT infrix-core (private):
+# GitHub bills Actions minutes on PRIVATE repos only; public repos get
+# unlimited free minutes on standard runners. At the */30 cadence this job runs
+# 1,440 times a month and every job is billed rounded UP to a full minute, so
+# in infrix-core it consumed ~1,440+ billable minutes/month — the single
+# largest line item in the Actions budget, larger than all of CI.
+#
+# The job probes ONLY public URLs and the public Accumulate Kermit endpoint. It
+# checks out no source, reads no secret, and touches nothing private — so
+# hosting it in a public repo costs nothing and loses nothing.
+#
+# DO NOT move this back into infrix-core. If you need it adjacent to the core
+# repo, keep it here and raise alerts cross-repo via ALERT_REPO/OPS_ISSUE_TOKEN
+# below.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # Fail a TLS check when fewer than this many days remain on the cert.
+  TLS_MIN_DAYS: "14"
+  # Where alert issues are filed. Defaults to this (public) repo. Set the
+  # ALERT_REPO variable to "opendlt/infrix-core" AND provide an OPS_ISSUE_TOKEN
+  # secret with `issues: write` on that repo to route alerts there instead.
+  ALERT_REPO: ${{ vars.ALERT_REPO || github.repository }}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe endpoints, TLS, and funnel links
+        id: probe
+        shell: bash
+        run: |
+          set -uo pipefail
+          fails=()
+
+          # --- HTTP reachability (name|url|expected-code) ---
+          checks=(
+            "node-health|https://devnet.infrix.opendlt.org/v4/health|200"
+            "playground|https://play.infrix.opendlt.org|200"
+            "composer|https://composer.infrix.opendlt.org|200"
+            "nexus|https://nexus.infrix.opendlt.org|200"
+            "site-home|https://infrix.opendlt.org|200"
+            "site-proof-live|https://infrix.opendlt.org/proof-live|200"
+            "site-why-infrix|https://infrix.opendlt.org/why-infrix|200"
+            "site-getting-started|https://infrix.opendlt.org/getting-started|200"
+          )
+          for c in "${checks[@]}"; do
+            IFS='|' read -r name url want <<< "$c"
+            got=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url" || echo "000")
+            if [ "$got" = "$want" ]; then
+              echo "OK   $name  $got  $url"
+            else
+              echo "FAIL $name  got=$got want=$want  $url"
+              fails+=("HTTP **$name** returned \`$got\` (want \`$want\`) — $url")
+            fi
+          done
+
+          # --- TLS expiry ---
+          for host in devnet.infrix.opendlt.org play.infrix.opendlt.org composer.infrix.opendlt.org nexus.infrix.opendlt.org infrix.opendlt.org; do
+            end=$(echo | openssl s_client -servername "$host" -connect "$host:443" 2>/dev/null \
+                  | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+            if [ -z "$end" ]; then
+              echo "FAIL tls  could not read cert for $host"
+              fails+=("TLS **$host** — could not read certificate")
+              continue
+            fi
+            end_epoch=$(date -d "$end" +%s 2>/dev/null || echo 0)
+            now_epoch=$(date +%s)
+            days=$(( (end_epoch - now_epoch) / 86400 ))
+            if [ "$end_epoch" -eq 0 ] || [ "$days" -lt "${TLS_MIN_DAYS}" ]; then
+              echo "FAIL tls  $host expires in ${days}d ($end)"
+              fails+=("TLS **$host** expires in \`${days}d\` ($end) — under ${TLS_MIN_DAYS}d threshold")
+            else
+              echo "OK   tls  $host ${days}d remaining"
+            fi
+          done
+
+          # --- Anchor signer credit floor (L0 query) ---
+          # The L4 node's anchor writes consume credits from the operator key
+          # page; alert well before they run dry so anchoring never stalls.
+          KEYPAGE="acc://infrixdevnet-1782843230226786400-1.acme/book/1"
+          CREDIT_FLOOR="100000"   # credit-units (=1000 credits); generous runway
+          bal=$(curl -s --max-time 20 -X POST https://kermit.accumulatenetwork.io/v3 \
+                -H 'Content-Type: application/json' \
+                -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"scope\":\"${KEYPAGE}\"}}" \
+                | grep -oE '"creditBalance":"?[0-9]+"?' | grep -oE '[0-9]+' | head -1)
+          if [ -z "$bal" ]; then
+            echo "FAIL credits  could not read key-page balance"
+            fails+=("Credits — could not read anchor signer key-page balance ($KEYPAGE)")
+          elif [ "$bal" -lt "$CREDIT_FLOOR" ]; then
+            echo "FAIL credits  balance $bal < floor $CREDIT_FLOOR"
+            fails+=("Credits — anchor signer key page at \`$bal\` credit-units (floor \`$CREDIT_FLOOR\`) — top up before anchoring stalls")
+          else
+            echo "OK   credits  balance $bal (floor $CREDIT_FLOOR)"
+          fi
+
+          # --- Report + status output ---
+          {
+            echo "report<<EOF"
+            if [ ${#fails[@]} -eq 0 ]; then
+              echo "All live-stack checks passed."
+            else
+              printf '%s\n' "${fails[@]/#/- }"
+            fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ ${#fails[@]} -eq 0 ]; then
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update alert issue on failure
+        if: steps.probe.outputs.status == 'fail'
+        uses: actions/github-script@v7
+        env:
+          REPORT: ${{ steps.probe.outputs.report }}
+          ALERT_REPO: ${{ env.ALERT_REPO }}
+        with:
+          # OPS_ISSUE_TOKEN routes alerts to ALERT_REPO (e.g. the private
+          # infrix-core). Without it the default GITHUB_TOKEN files the alert
+          # in this repo, which still works out of the box.
+          github-token: ${{ secrets.OPS_ISSUE_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const [owner, repo] = process.env.ALERT_REPO.split('/');
+            const label = 'uptime-alert';
+            const title = '🔴 Live stack check failing';
+            const body = `Automated uptime monitor detected failing checks:\n\n${process.env.REPORT}\n\n_Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}_`;
+            const existing = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label,
+            });
+            if (existing.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.data[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: [label],
+              });
+            }
+            core.setFailed('Live stack check failing — see alert issue.');
+
+      - name: Auto-close alert issue on recovery
+        if: steps.probe.outputs.status == 'pass'
+        uses: actions/github-script@v7
+        env:
+          ALERT_REPO: ${{ env.ALERT_REPO }}
+        with:
+          github-token: ${{ secrets.OPS_ISSUE_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const [owner, repo] = process.env.ALERT_REPO.split('/');
+            const label = 'uptime-alert';
+            const existing = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label,
+            });
+            for (const issue of existing.data) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: `✅ Recovered — all live-stack checks passed at run ${context.runId}.`,
+              });
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number, state: 'closed',
+              });
+            }
