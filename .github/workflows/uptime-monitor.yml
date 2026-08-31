@@ -63,7 +63,9 @@ jobs:
           )
           for c in "${checks[@]}"; do
             IFS='|' read -r name url want <<< "$c"
-            got=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url" || echo "000")
+            # No `|| echo 000` here: curl already emits 000 via -w on failure, so
+            # the fallback would concatenate and report a bogus got=000000.
+            got=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url")
             if [ "$got" = "$want" ]; then
               echo "OK   $name  $got  $url"
             else
@@ -73,7 +75,11 @@ jobs:
           done
 
           # --- TLS expiry ---
-          for host in devnet.infrix.opendlt.org play.infrix.opendlt.org composer.infrix.opendlt.org nexus.infrix.opendlt.org infrix.opendlt.org; do
+          # 116-202-214-38.sslip.io is included deliberately: it is the only cert
+          # issued via TLS-ALPN-01 (all others use acme.sh DNS-01), so it is the
+          # one most likely to fail renewal silently — as it did for 11 days in
+          # Aug 2026 while no check watched it.
+          for host in devnet.infrix.opendlt.org play.infrix.opendlt.org composer.infrix.opendlt.org nexus.infrix.opendlt.org infrix.opendlt.org 116-202-214-38.sslip.io; do
             end=$(echo | openssl s_client -servername "$host" -connect "$host:443" 2>/dev/null \
                   | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
             if [ -z "$end" ]; then
