@@ -69,54 +69,100 @@ context so the runtime's disclosure layer can evaluate what each caller is allow
 
 ## `IntentClient` — submit & read intents
 
-Reached via `client.intents`. Wraps `POST /v4/intents` and the per-intent read endpoints.
+Reached via `client.intents`. Submits an intent through the governed spine and reads its per-intent records. Each read answers
+exactly the members its route declares; an answer that lacks one is refused, never read as empty.
 
 ```typescript
-interface SubmitIntentRequest {
-  /** Canonical goal type, e.g. "GOVERNED_TRANSFER", "CONTRACT_CALL", "DEPLOY". */
-  goal: string;
-  /** Goal-specific typed parameters. Shape depends on `goal`. */
-  params: Record<string, unknown>;
-  /** Submitting actor. Defaults to the client's disclosure actor if omitted. */
-  actor?: string;
-  /** Optional idempotency key; a repeat submit with the same key returns the first intent. */
-  idempotencyKey?: string;
-}
-
-interface Intent {
-  id: string;                 // "intent-abc123"
-  goal: string;
-  status: IntentStatus;       // see below
-  submittedAt: string;        // ISO-8601
-}
-
 type IntentStatus =
-  | "submitted"     // accepted, plan compiling
-  | "planned"       // plan ready, awaiting approvals
-  | "approved"      // all required approvals in
+  | "pending"
+  | "planning"
+  | "awaiting_approval"
   | "executing"
-  | "settled"       // terminal success
-  | "rejected"      // terminal failure (policy / approval / execution)
-  ;
+  | "completed"      // terminal success
+  | "failed"         // terminal failure (policy / approval / execution)
+  | "cancelled"
+  | "expired";
+
+/** What submit() resolves with. */
+interface IntentResult {
+  intentId: string;
+  status: IntentStatus;
+  planId?: string;
+  outcomeId?: string;
+  gasUsed?: number;
+  evidenceId?: string;
+  error?: string;
+  blockHeight?: number;
+}
+
+/** GET /v4/intents/{id} */
+interface IntentAnswer {
+  intent: unknown;   // the intent as the object registry holds it
+  status: unknown;   // its lifecycle state, an IntentStatus
+}
+
+/** The page every list route answers (GET /v4/intents, /v4/intents/pending, /v4/approvals, ...). */
+interface ListAnswer {
+  items: unknown;        // registry objects: { id, type, state, url, created, updated, version, createdByIntentId, audit, fields }
+  pagination: unknown;   // { offset, limit, total }
+}
+
+/** GET /v4/intents/{id}/evidence */
+interface IntentEvidenceAnswer {
+  bundles: unknown;      // the evidence bundles linked to the intent; each one's `id` is the evidence id
+  count: unknown;
+  intent: unknown;
+  intentId: unknown;
+}
 
 class IntentClient {
-  /** POST /v4/intents — submit a governed intent. Resolves once accepted (status "submitted"). */
-  submit(req: SubmitIntentRequest): Promise<Intent>;
+  /** POST /v4/intents — submit a governed intent. */
+  submit(goal: IntentGoal | string, opts?: IntentSubmitOptions): Promise<IntentResult>;
 
-  /** GET /v4/intents/{id} — current intent record. */
-  get(id: string): Promise<Intent>;
+  /** GET /v4/intents/{id} — `{ intent, status }`. */
+  get(intentId: string): Promise<IntentAnswer>;
+
+  /** GET /v4/intents — `{ items, pagination }`. The route accepts `status` and `goalType` and nothing else; any other key is refused by name. */
+  list(filter?: { status?: IntentStatus; goalType?: string }): Promise<ListAnswer>;
+
+  /** GET /v4/intents/pending — `{ items, pagination }` of what awaits the CALLING ACTOR. Takes no parameters: construct the client with the approver as `actor`; passing an identity is refused by name. */
+  pending(): Promise<ListAnswer>;
 
   /** GET /v4/intents/{id}/plan — the compiled ExecutionPlan (see ExecutionPlan below). */
-  plan(id: string): Promise<ExecutionPlan>;
+  plan(intentId: string): Promise<ExecutionPlan>;
 
-  /** GET /v4/intents/{id}/outcome — resolves once the intent reaches a terminal state.
-   *  Polls (or long-polls) until settled/rejected; rejects on terminal failure. */
-  awaitOutcome(id: string): Promise<Outcome>;
+  /** Sign-and-submit the approval for a parked stage (the signature comes from the material client.approvals.signing() publishes). */
+  approve(intentId: string, planHash: string, opts: {
+    approver: string; role?: string; keyPageRef: string; signature: string; signerPublicKey: string; stageId?: string;
+  }): Promise<GovernedApproveResult>;
 
-  /** GET /v4/intents/{id}/evidence — the portable evidence bundle for offline verification. */
-  evidence(id: string): Promise<EvidenceBundle>;
+  /** GET /v4/intents/outcome — the OutcomeRecord (see below). */
+  outcome(intentId: string): Promise<OutcomeRecord>;
+
+  /** GET /v4/intents/{id}/evidence — `{ bundles, count, intent, intentId }`. The answer is NOT a bundle. */
+  evidence(intentId: string): Promise<IntentEvidenceAnswer>;
+
+  /** Cancel an intent that has not executed. */
+  cancel(intentId: string, reason?: string): Promise<void>;
 }
 ```
+
+### Finding an intent's evidence
+
+The evidence routes (`client.evidence.get / verify / export / anchor`) take the id of an evidence **bundle**
+(`ev-<intentId>`), not the id of the intent. Ask the intent for its bundles, then use the bundle's id:
+
+```typescript
+const { bundles } = await client.intents.evidence(intentId);                  // { bundles, count, intent, intentId }
+const evidenceId = (bundles as Array<{ id: string }>)[0].id;
+const verified = await client.evidence.verify(evidenceId);                    // { bundleId, chainVerified }
+const exported = await client.evidence.export(evidenceId, "json");            // { bundle, bundleId, bytes, exportHash, format }
+const anchor = await client.evidence.anchor(evidenceId);                      // { anchorBlock, anchorDataIdx, anchorStatus, anchorTxHash, bundleId, stateRoot }
+```
+
+`evidenceIdForIntent(client, intentId)` does the lookup in one call: `undefined` while the intent has no bundle, the bundle's id
+when it has one, and for several bundles the one whose id is `ev-<intentId>` (the id the node gives an intent's bundle) when
+exactly one carries it — otherwise it throws, naming every id and `client.evidence.exportPortable(id)`.
 
 ### `ExecutionPlan` shape
 
@@ -148,18 +194,24 @@ interface ApprovalRequirement {
 }
 ```
 
-### `Outcome` shape
+### `OutcomeRecord` shape
 
 ```typescript
-interface Outcome {
-  intentId: string;
-  status: IntentStatus;             // "settled" | "rejected"
-  finality: FinalityState;
-  evidenceBundle: EvidenceBundle;   // the portable receipt
-  gasUsed?: number;
+interface OutcomeRecord {
+  id: string;
+  planId: string;
+  completedAt: string;                              // ISO-8601
+  blockHeight: number;
+  overallStatus: "completed" | "failed" | "compensated";
+  stepOutcomes: StepOutcome[];
+  totalGasUsed: number;
+  totalGasPlanned: number;
+  gasDrift: number;                                 // percentage
+  approvalEvidence: ApprovalRef[];
+  outcomeHash: string;                              // hex SHA-256
+  planHashVerified: boolean;
+  evidenceBundleId?: string;                        // the id to pass to client.evidence.*
 }
-
-type FinalityState = "provisional" | "locally_final" | "l0_anchored_final";
 ```
 
 ## `IntentStream` — live lifecycle events
