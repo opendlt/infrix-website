@@ -29,6 +29,8 @@ jobs:
       # Relocated docs-site fence: every nav/sidebar-linked page must exist,
       # vitepress config well-formed, governance-first framing intact.
       - run: node --test docs-structure.test.mjs
+      # The hosted Infrix DID context is immutable: the pinned bytes and the nginx rule.
+      - run: node --test ns-context.test.mjs
       - run: npm run build
       - name: Publish to gh-pages
         run: |

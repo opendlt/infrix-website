@@ -15,3 +15,7 @@
 *.gif binary
 *.ico binary
 *.webp binary
+
+# The hosted Infrix DID context is immutable: infrix core pins its SHA-256 and this repository's
+# ns-context test pins the same digest, so no platform may rewrite its bytes.
+docs/public/ns/did/v1.jsonld -text
