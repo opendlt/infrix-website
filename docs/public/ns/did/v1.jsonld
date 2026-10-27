@@ -7,6 +7,7 @@
     "infrix": "https://infrix.opendlt.org/ns/did/v1#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "AccumulateKeyPage": { "@id": "infrix:AccumulateKeyPage" },
+    "AccumulateKeyPageProof": { "@id": "infrix:AccumulateKeyPageProof" },
     "keyPageUrl": { "@id": "infrix:keyPageUrl", "@type": "@id" },
     "keyBookUrl": { "@id": "infrix:keyBookUrl", "@type": "@id" },
     "pageIndex": { "@id": "infrix:pageIndex", "@type": "xsd:nonNegativeInteger" },

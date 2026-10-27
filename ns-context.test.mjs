@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const PINNED = '3394738e992a2d0409d286aa688ccbdba78bf7471ecd054baa0d54e653b627da';
+const PINNED = 'aaad098874fa0984e29a84bca5a1e52048bd54936513585e74f425bd1f530247';
 const context = readFileSync(join(root, 'docs/public/ns/did/v1.jsonld'));
 const nginx = readFileSync(join(root, 'deploy/nginx/ns-did-v1.conf'), 'utf8');
 const page = readFileSync(join(root, 'docs/ns/did/v1.md'), 'utf8');
@@ -31,7 +31,7 @@ test('PLANTED DEFECT: one extra byte changes the digest, so an edited context is
 
 test('the context is a JSON-LD context defining every private term core emits', () => {
   const doc = JSON.parse(context.toString('utf8'));
-  for (const term of ['AccumulateKeyPage', 'keyPageUrl', 'keyBookUrl', 'pageIndex', 'threshold',
+  for (const term of ['AccumulateKeyPage', 'AccumulateKeyPageProof', 'keyPageUrl', 'keyBookUrl', 'pageIndex', 'threshold',
     'CredentialRegistry', 'LinkedData', 'InfrixContract', 'InfrixAPI', 'description']) {
     assert.ok(term in doc['@context'], `term ${term} is undefined in the hosted context`);
   }
