@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@protected": true,
+    "id": "@id",
+    "type": "@type",
+    "infrix": "https://infrix.opendlt.org/ns/did/v1#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "AccumulateKeyPage": { "@id": "infrix:AccumulateKeyPage" },
+    "AccumulateKeyPageProof": { "@id": "infrix:AccumulateKeyPageProof" },
+    "keyPageUrl": { "@id": "infrix:keyPageUrl", "@type": "@id" },
+    "keyBookUrl": { "@id": "infrix:keyBookUrl", "@type": "@id" },
+    "pageIndex": { "@id": "infrix:pageIndex", "@type": "xsd:nonNegativeInteger" },
+    "threshold": { "@id": "infrix:threshold", "@type": "xsd:nonNegativeInteger" },
+    "CredentialRegistry": { "@id": "infrix:CredentialRegistry" },
+    "LinkedData": { "@id": "infrix:LinkedData" },
+    "InfrixContract": { "@id": "infrix:InfrixContract" },
+    "InfrixAPI": { "@id": "infrix:InfrixAPI" },
+    "description": { "@id": "https://schema.org/description" }
+  }
+}
