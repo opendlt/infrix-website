@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"
+     aria-label="Infrix mark: a governance spine resolving into a checkmark">
+  <title>Infrix</title>
+  <!-- flowing spine line: nodes left→right, then it lifts into a checkmark -->
+  <g fill="none" stroke="#4F8CFF" stroke-width="3"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- the spine: a gentle line carrying the pulse -->
+    <path d="M8 36 H30" />
+    <!-- the resolve: line lifts into a check -->
+    <path d="M30 36 L40 46 L56 18" stroke="#58E6B0" />
+  </g>
+  <!-- the nodes; the last is the verified terminus (green) -->
+  <g fill="#4F8CFF">
+    <circle cx="8"  cy="36" r="3.5"/>
+    <circle cx="15" cy="36" r="3"/>
+    <circle cx="22" cy="36" r="3"/>
+    <circle cx="30" cy="36" r="4"/>
+    <circle cx="40" cy="46" r="3"/>
+  </g>
+  <g fill="#58E6B0">
+    <circle cx="56" cy="18" r="4.5"/>
+  </g>
+</svg>
